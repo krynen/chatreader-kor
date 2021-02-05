@@ -386,16 +386,19 @@
 						default:
 							break;
 					}
+
+					// 명령어는 읽지 않음
+					return;
 				}
 
 				// 초기화 후에만 읽음
 				else {
 					if (window.initok) {
-						let index = window.banlist.indexOf(e.name);
+						let index = window.banlist.indexOf(e.name.toLowerCase());
 						let message = e.plain;
 
 						// 금지단어 포함 메세지 전체 읽지 않음
-						let keyword_test = new RegExp(`(${window.bankeyword.join("|")})`, "g");
+						let keyword_test = new RegExp(`(${window.bankeyword.join("|")})`, "ig");
 						if (keyword_test.test(message)) { return; }
 
 						// Personality 적용
