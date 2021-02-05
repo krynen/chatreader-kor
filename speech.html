@@ -142,7 +142,11 @@
 		window.emotelist = localStorage.getItem("tts_emote_" + window.channelname) !== null ? JSON.parse(localStorage.getItem("tts_emote_" + window.channelname)) : {};
 
 		// 기본적으로 밴할 리스트
-		window.banlist = window.banlist.concat(['Nightbot', '싹둑', "Twipkr"]);
+		window.banlist = window.banlist.concat(['nightbot', '싹둑', "twipkr"]);
+		window.banlist = window.banlist.reduce((acc, cur) => {
+			acc.push(cur.toLowerCase());
+			return acc;
+		}, []);
 
 		// 기본적으로 밴할 키워드
 		window.bankeyword = window.bankeyword.concat(['섹스']);
@@ -191,6 +195,7 @@
 
 		// 초기화
 		let clickok = false;
+		let TIRCL = new TIRCListener();
 		$(document).on('click', function() {
 			if (!clickok) { clickok = true; }
 			else { return; }
@@ -245,7 +250,6 @@
 				}
 			}
 
-			let TIRCL = new TIRCListener();
 			TIRCL.on("chat", (e) => {
 				if (!e.badges) { e.badges = {}; }
 
