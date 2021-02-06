@@ -44,42 +44,35 @@
 
 		/**
 		 * 트위치 이모티콘을 공백으로 치환
-		 * @param {String} str
+		 * @param {String} message
+		 * @param {Array} 
 		 * @returns {String} message without twitch emoticon
 		 */
-		function replaceTwitchEmoticon(message, emotes) {
-			var ranges;
-			var id;
-			var emote_id;
-			var regExp;
-			var replace_list = {};
+		function replaceTwitchEmoticon(message, emoteList) {
+			let msgs = message.split(" ");
+			emoteList.filter((parsed) => {
+				switch (parsed.type) {
+					case "emote":
+					case "cheermote":
+						return true;
 
-			if (typeof emotes != 'undefined') {
-				var emote_list = emotes.split("/");
-				emote_list.forEach(function(emote_replace) {
-					ranges = emote_replace.split(":");
-					id = ranges[0];
-					if (typeof ranges[1] == 'undefined') return;
-					ranges = ranges[1].split(",");
-					if (typeof ranges[0] != 'undefined') {
-						ranges = ranges[0].split("-");
-						emote_id = message.substring(parseInt(ranges[0]), parseInt(ranges[1]) + 1);
-						replace_list[emote_id] = id;
+					default:
+						return false;
+				}
+			}).forEach((parsed) => {
+				let regExp = new RegExp(`^${escapeRegExp(parsed.plain)}$`);
+
+				msgs.forEach((msg, ind) => {
+					if (parsed.type == "emote") {
+						let replacer = window.emotelist[parsed.plain] || "";
+						msgs[ind] = msg.replace(regExp, replacer);
+					} else {
+						msgs[ind] = msg.replace(regExp, "");
 					}
 				});
-
-				for (var replace_id in replace_list) {
-					regExp = new RegExp(escapeRegExp(replace_id), "g");
-					
-					if (typeof window.emotelist[replace_id] != 'undefined') {
-						message = message.replace(regExp, window.emotelist[replace_id]);
-					} else {
-						message = message.replace(regExp, "");
-					}
-				}
-			}
-
-			return message;
+			});
+			
+			return msgs.join(" ");
 		}
 
 		/**
@@ -153,9 +146,15 @@
 
 		// 기본적으로 읽을 이모티콘
 		Object.assign(window.emotelist, {
-			'silver119SilverHae' : '헤',
-			'silver119SilverEuu' : '으',
-			'silver119SilverUk'  : '윽'
+			'mrwateRTbottle' : '물',
+			'mrwateRTpride' : '펄럭',
+			'silver119Hmm' : '흠',
+			'silver119Heuk' : '헤윽',
+			'silver119Trd' : 'ㅆㄱㅇ',
+			'silver119Hing' : '힝',
+			'silver119Zero' : '제로콜라',
+			'silver119Tach' : '타치온',
+			'silver119Hi' : '하이'
 		});
 		
 		// 구독자 전용
@@ -465,7 +464,7 @@
 						if (message.charCodeAt(message.length - 1) === 1) message = message.substr(0, message.length - 1);
 
 						// 트위치 이모티콘
-						message = replaceTwitchEmoticon(message, e.emotes);
+						message = replaceTwitchEmoticon(message, e.text);
 
 						// 한글 자모음 처리
 						message = message.replace(/ㄱ/g, "기역");
